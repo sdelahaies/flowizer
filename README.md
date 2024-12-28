@@ -48,7 +48,7 @@ Flowizer is a lightweight and extensible workflow engine for creating, managing,
 
 ### Define a Workflow
 
-Workflows are defined using YAML configuration files. Each node specifies its type, upstream and downstream dependencies, and input/output parameters. Example `pdf2text_flow.yaml`:
+Workflows are defined using YAML configuration files to be found in the `config` folder. Each node specifies its type, upstream and downstream dependencies, and input/output parameters. Example `pdf2text_flow.yaml`:
 
 ```yaml
 name: pdf2text_flow
