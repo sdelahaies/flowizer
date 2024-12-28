@@ -1,0 +1,18 @@
+name: extractdata_flow
+createdAt: 27-12-24 14:23:00
+nodes:
+  - 1: Input,input_fn
+  - 2: PDF2Text,pdf2text_fn
+  - 3: Output,output_fn
+  - 5: OllamaExtract,ollama_fn
+flow: 
+  - 1>>2
+  - 2>>5
+  - 2,5>>3
+inputs:
+  - Input: 
+      filename: "dell-xps-8960-pcf-datasheet.pdf"
+params:
+  - OllamaExtract:
+      model: "llama3.2:3b"
+      system: "You are an expert in document analysis. You extract the information requested by the user from the document given as input. Do not add any information that is not in the document. Do not great the user. Do not add any comment. Only anwser using the json format given by the user."

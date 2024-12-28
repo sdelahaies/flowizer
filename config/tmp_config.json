@@ -1,0 +1,55 @@
+{
+    "name": "pdf2text_flow",
+    "createdAt": "27-12-24 14:23:00",
+    "workflow": [
+        {
+            "name": "Input",
+            "type": "input_fn",
+            "upstream": [],
+            "downstream": [
+                "PDF2Text"
+            ],
+            "data": {
+                "input": {
+                    "filename": "dell-xps-8960-pcf-datasheet.pdf"
+                },
+                "output": {},
+                "param": {}
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "PDF2Text",
+            "type": "pdf2text_fn",
+            "upstream": [
+                "Input"
+            ],
+            "downstream": [
+                "Output"
+            ],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {}
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "Output",
+            "type": "output_fn",
+            "upstream": [
+                "PDF2Text"
+            ],
+            "downstream": [],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {}
+            },
+            "status": "pending",
+            "completedAt": null
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+name: trivial_flow
+createdAt: 17-06-23 14:55:00
+nodes:
+  - 1: Input,input_fn
+  - 2: Output,output_fn
+flow: 
+  - 1>>2
+inputs:
+  - Input: 
+      text: "Hello, world!"

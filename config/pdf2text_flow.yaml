@@ -1,0 +1,12 @@
+name: pdf2text_flow
+createdAt: 27-12-24 14:23:00
+nodes:
+  - 1: Input,input_fn
+  - 2: PDF2Text,pdf2text_fn
+  - 4: Output,output_fn
+flow: 
+  - 1>>2
+  - 2>>4
+inputs:
+  - Input: 
+      filename: "dell-xps-8960-pcf-datasheet.pdf"

@@ -1,0 +1,23 @@
+pypubsub
+fastapi
+requests
+uvicorn
+python-multipart
+matplotlib
+networkx
+PyYAML
+python-dotenv
+pytest
+graphviz
+sphinx
+sphinx-rtd-theme
+flask
+flask-cors
+Werkzeug
+psycopg2-binary
+emoji
+# nodes related packages
+pypdf
+PyMuPDF
+pdftotext
+pymongo
