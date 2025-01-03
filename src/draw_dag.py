@@ -34,7 +34,7 @@ def draw_dag(data, output, fmt='png',view=True):
     for ninfo in node_mapping.values():
         nname, ntype = ninfo.split(',')
         nlabel = f'{nname}\n{ntype}'
-        dot.node(nname, label=nlabel, style='filled', color='lightblue')
+        dot.node(nname, label=nlabel, type=ntype, style='filled', color='lightblue')
 
     # Add edges to the Digraph
     edges = set()

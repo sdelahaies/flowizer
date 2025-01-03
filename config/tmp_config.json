@@ -1,5 +1,5 @@
 {
-    "name": "pdf2text_flow",
+    "name": "conditional_flow",
     "createdAt": "27-12-24 14:23:00",
     "workflow": [
         {
@@ -26,6 +26,7 @@
                 "Input"
             ],
             "downstream": [
+                "OllamaExtract",
                 "Output"
             ],
             "data": {
@@ -40,13 +41,111 @@
             "name": "Output",
             "type": "output_fn",
             "upstream": [
-                "PDF2Text"
+                "OllamaExtract",
+                "PDF2Text",
+                "AcceptFootprint",
+                "RejectFootprint"
             ],
             "downstream": [],
             "data": {
                 "input": {},
                 "output": {},
                 "param": {}
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "Prompt",
+            "type": "prompt_fn",
+            "upstream": [],
+            "downstream": [
+                "OllamaExtract"
+            ],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {}
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "OllamaExtract",
+            "type": "ollama_fn_2",
+            "upstream": [
+                "Prompt",
+                "PDF2Text"
+            ],
+            "downstream": [
+                "TestFootprint",
+                "Output"
+            ],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {
+                    "model": "llama3.2:3b",
+                    "system": "You are an expert in document analysis. You extract the information requested by the user from the document given as input. Do not add any information that is not in the document. Do not great the user. Do not add any comment. Only anwser using the json format given by the user."
+                }
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "TestFootprint",
+            "type": "testfootprint_fn",
+            "upstream": [
+                "OllamaExtract"
+            ],
+            "downstream": [
+                "RejectFootprint",
+                "AcceptFootprint"
+            ],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {
+                    "mode": "conditional"
+                }
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "AcceptFootprint",
+            "type": "acceptfootprint_fn",
+            "upstream": [
+                "TestFootprint"
+            ],
+            "downstream": [
+                "Output"
+            ],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {
+                    "branch": "A"
+                }
+            },
+            "status": "pending",
+            "completedAt": null
+        },
+        {
+            "name": "RejectFootprint",
+            "type": "rejectfootprint_fn",
+            "upstream": [
+                "TestFootprint"
+            ],
+            "downstream": [
+                "Output"
+            ],
+            "data": {
+                "input": {},
+                "output": {},
+                "param": {
+                    "branch": "B"
+                }
             },
             "status": "pending",
             "completedAt": null

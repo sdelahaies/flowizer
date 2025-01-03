@@ -2,6 +2,7 @@ pypubsub
 fastapi
 requests
 uvicorn
+pydantic
 python-multipart
 matplotlib
 networkx

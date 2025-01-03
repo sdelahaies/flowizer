@@ -1,0 +1,247 @@
+{
+    "input": {
+        "nodes": [
+            {
+                "id": "Input",
+                "type": "Custom",
+                "position": {
+                    "x": 56.57,
+                    "y": -475.57
+                },
+                "data": {
+                    "label": "Input",
+                    "code": "def input_fn(input:dict,param={}) -> dict:\n    \"\"\"\n    Return the input dictionary as is.\n\n    Args:\n        input: A dictionary to be returned.\n\n    Returns:\n        The input dictionary unchanged.\n    \"\"\"\n    return input\n\n"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 56.57,
+                    "y": -475.57
+                },
+                "dragging": false
+            },
+            {
+                "id": "PDF2Text",
+                "type": "Custom",
+                "position": {
+                    "x": 56.57,
+                    "y": -385.83
+                },
+                "data": {
+                    "label": "PDF2Text",
+                    "code": "import pdftotext\n\ndef pdf2text_fn(input:dict,param={}) -> dict:\n    \"\"\"\nExtract text content from a PDF file by reading the file and converting it to text using pdftotext library.\n\nArgs:\n    input (dict): A dictionary containing the file input information.\n    param (dict, optional): Additional parameters for processing. Defaults to an empty dictionary.\n\nReturns:\n    dict: A dictionary with the extracted text content from the PDF file, or an error dictionary if an exception occurs.\n\"\"\"\n    key=list(input.keys())[0]\n    filename = input[key]['filename']\n    try:\n        with open(f\"../uploads/{filename}\", \"rb\") as f:\n            pdf = pdftotext.PDF(f)\n            return {'text': \"\\n\\n\".join(pdf)}\n    except Exception as e:\n        return {'error': str(e)}"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 56.57,
+                    "y": -385.83
+                },
+                "dragging": false
+            },
+            {
+                "id": "Output",
+                "type": "Custom",
+                "position": {
+                    "x": 149.57,
+                    "y": -26.87
+                },
+                "data": {
+                    "label": "Output",
+                    "code": "def output_fn(input:dict, param={}) -> dict:\n    \"\"\"\nReturn the input dictionary unchanged.\n\nArgs:\n    input (dict): The input dictionary to be returned.\n    param (dict, optional): Additional parameters for processing. Defaults to an empty dictionary.\n\nReturns:\n    dict: The input dictionary.\n\"\"\"\n    #print(input)\n    return input\n"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 149.57,
+                    "y": -26.87
+                },
+                "dragging": false
+            },
+            {
+                "id": "OllamaExtract",
+                "type": "Custom",
+                "position": {
+                    "x": 167.57,
+                    "y": -296.09
+                },
+                "data": {
+                    "label": "OllamaExtract",
+                    "code": "from ollama import chat\n\n\ndef ollama_fn_2(input: dict, param={}):\n    try:\n        #print(input)\n        messages = []\n        if \"model\" in param.keys():\n            model = param[\"model\"]\n        if \"system\" in param.keys():\n            system_prompt = param[\"system\"]\n            messages.append({\"role\": \"system\", \"content\": system_prompt})\n    \n        prompt = input[\"Prompt\"][\"text\"]\n        document = input[\"PDF2Text\"][\"text\"]\n        messages.append({\"role\": \"user\", \"content\": prompt.format(document=document)})\n        response = chat(model=model, messages=messages,options={\"temperature\":0.})\n        return {\"text\": response.message.content}\n    except Exception as e:\n        return {\"error\": str(e)}\n\n"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 167.57,
+                    "y": -296.09
+                },
+                "dragging": false
+            },
+            {
+                "id": "Prompt",
+                "type": "Custom",
+                "position": {
+                    "x": 183.57,
+                    "y": -385.83
+                },
+                "data": {
+                    "label": "Prompt",
+                    "code": "def prompt_fn(Input=None,param={}):\n    return {\"text\":\"\"\"Extract the product\\'s name and estimated carbon footprint from the document below:\n<document>    \n{document}\n</document>\nreturn the information as json object using the following keys:\n\n'name': 'product_name',\n'footprint': 'product_footprint'\n'unit': 'footprint_unit'\n\nwhere the product_name is a string (eg Dell inspiron 3546), the product_footprint is a float (eg 456), and the footprint_unit is a string eg (eg kgCO2e).\nDo not add any additional information to the output.\n\"\"\"}"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 183.57,
+                    "y": -385.83
+                },
+                "dragging": false
+            },
+            {
+                "id": "TestFootprint",
+                "type": "Custom",
+                "position": {
+                    "x": 204.57,
+                    "y": -206.35
+                },
+                "data": {
+                    "label": "TestFootprint",
+                    "code": "import json\n\ndef testfootprint_fn(input, param={}):\n    try:\n        key = list(input.keys())[0]\n        data = json.loads(input[key]['text'])\n        #print(data)\n        if float(data[\"footprint\"])>450:\n            return {'branch': 'AcceptFootprint'}\n        else:\n            return {'branch': 'RejectFootprint'}\n    except Exception as e:\n        return {\"error\": str(e)}"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 204.57,
+                    "y": -206.35
+                },
+                "dragging": false
+            },
+            {
+                "id": "AcceptFootprint",
+                "type": "Custom",
+                "position": {
+                    "x": 204.57,
+                    "y": -116.61
+                },
+                "data": {
+                    "label": "AcceptFootprint",
+                    "code": "def acceptfootprint_fn(input,param={}):\n    return input"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 204.57,
+                    "y": -116.61
+                },
+                "dragging": false
+            },
+            {
+                "id": "RejectFootprint",
+                "type": "Custom",
+                "position": {
+                    "x": 383.57,
+                    "y": -116.61
+                },
+                "data": {
+                    "label": "RejectFootprint",
+                    "code": "def rejectfootprint_fn(input,param={}):\n    return input"
+                },
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 383.57,
+                    "y": -116.61
+                },
+                "dragging": false
+            }
+        ],
+        "edges": [
+            {
+                "source": "Input",
+                "sourceHandle": "b",
+                "target": "PDF2Text",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-Input-PDF2Text"
+            },
+            {
+                "source": "PDF2Text",
+                "sourceHandle": "b",
+                "target": "Output",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-PDF2Text-Output"
+            },
+            {
+                "source": "PDF2Text",
+                "sourceHandle": "b",
+                "target": "OllamaExtract",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-PDF2Text-OllamaExtract"
+            },
+            {
+                "source": "Prompt",
+                "sourceHandle": "b",
+                "target": "OllamaExtract",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-Prompt-OllamaExtract"
+            },
+            {
+                "source": "OllamaExtract",
+                "sourceHandle": "b",
+                "target": "Output",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-OllamaExtract-Output"
+            },
+            {
+                "source": "OllamaExtract",
+                "sourceHandle": "b",
+                "target": "TestFootprint",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-OllamaExtract-TestFootprint"
+            },
+            {
+                "source": "TestFootprint",
+                "sourceHandle": "b",
+                "target": "AcceptFootprint",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-TestFootprint-AcceptFootprint"
+            },
+            {
+                "source": "TestFootprint",
+                "sourceHandle": "b",
+                "target": "RejectFootprint",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-TestFootprint-RejectFootprint"
+            },
+            {
+                "source": "AcceptFootprint",
+                "sourceHandle": "b",
+                "target": "Output",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-AcceptFootprint-Output"
+            },
+            {
+                "source": "RejectFootprint",
+                "sourceHandle": "b",
+                "target": "Output",
+                "targetHandle": null,
+                "type": "custom-edge",
+                "deletable": true,
+                "id": "reactflow__edge-RejectFootprint-Output"
+            }
+        ],
+        "viewport": {
+            "x": 670.1413230441351,
+            "y": 255.34751684975103,
+            "zoom": 0.5921495954782059
+        }
+    }
+}

@@ -1,20 +1,20 @@
 digraph {
 	Input [label="Input
-input_fn" color=lightblue style=filled]
+input_fn" color=lightblue style=filled type=input_fn]
 	PDF2Text [label="PDF2Text
-pdf2text_fn" color=lightblue style=filled]
+pdf2text_fn" color=lightblue style=filled type=pdf2text_fn]
 	Output [label="Output
-output_fn" color=lightblue style=filled]
+output_fn" color=lightblue style=filled type=output_fn]
 	Prompt [label="Prompt
-prompt_fn" color=lightblue style=filled]
+prompt_fn" color=lightblue style=filled type=prompt_fn]
 	OllamaExtract [label="OllamaExtract
-ollama_fn_2" color=lightblue style=filled]
+ollama_fn_2" color=lightblue style=filled type=ollama_fn_2]
 	TestFootprint [label="TestFootprint
-testfootprint_fn" color=lightblue style=filled]
+testfootprint_fn" color=lightblue style=filled type=testfootprint_fn]
 	AcceptFootprint [label="AcceptFootprint
-acceptfootprint_fn" color=lightblue style=filled]
+acceptfootprint_fn" color=lightblue style=filled type=acceptfootprint_fn]
 	RejectFootprint [label="RejectFootprint
-rejectfooprint_fn" color=lightblue style=filled]
+rejectfootprint_fn" color=lightblue style=filled type=rejectfootprint_fn]
 	Input -> PDF2Text
 	PDF2Text -> OllamaExtract
 	Prompt -> OllamaExtract

@@ -4,6 +4,7 @@ import os
 import secrets
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from werkzeug.utils import secure_filename
 from yaml2json_workflow import generate_json_workflow
 from main import run_workflow
@@ -12,11 +13,26 @@ from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 import yaml
 from draw_dag import draw_dag
+from svg2reactflow import svg2reactflow
+from pydantic import BaseModel
+
+class config(BaseModel):
+    filename: str
 
 app = FastAPI(
     title="Flowiser Workflow Engine",
     description="A simple workflow engine for running DAG workflows",
 )
+
+# Enable CORS for specific origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173","http://localhost:3000","http://localhost:4000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 inputname = None
 app.secret_key = secrets.token_urlsafe(16)
@@ -26,11 +42,14 @@ app.secret_key = secrets.token_urlsafe(16)
 UPLOAD_FOLDER = "../uploads"
 CONFIG_FOLDER = "../config"
 OUTPUT_FOLDER = "../outputs"
+outfile=None
+fmt="svg"
 app.mount("/uploads", StaticFiles(directory=UPLOAD_FOLDER), name="uploads")
 
 
 @app.post("/runflow")
-async def run_flow(config: str = None) -> dict:
+#async def run_flow(config: str = None) -> dict:
+async def run_flow(config: config) -> dict:
     """Execute a workflow using a specified configuration.
 
     This asynchronous endpoint triggers workflow execution using a specified configuration file and returns the results of the workflow processing.
@@ -47,8 +66,8 @@ async def run_flow(config: str = None) -> dict:
     global inputname
     if config is None:
         raise HTTPException(status_code=400, detail="No configuration file provided")
-
-    dto = generate_json_workflow(os.path.join(CONFIG_FOLDER, config))
+    filename = config.filename
+    dto = generate_json_workflow(os.path.join(CONFIG_FOLDER, filename))
     for node in dto["workflow"]:
         if node["name"] == "FileInput":
             node["data"]["input"]["filename"] = inputname
@@ -141,19 +160,37 @@ async def clean_files(folder: str = "outputs"):
 
 
 @app.post("/drawdag")
-async def drawdag(config: str = None, CONFIG_FOLDER:str= CONFIG_FOLDER, OUTPUT_FOLDER: str = OUTPUT_FOLDER, outfile:str=None,fmt: str = "png"):
-    #try:
-    with open(os.path.join(CONFIG_FOLDER,config)) as f:
-        data=yaml.load(f, Loader=yaml.FullLoader)
-    print(data)
-    print(fmt)
-    if outfile is None:
-        outfile = f"{OUTPUT_FOLDER}/{config.split('.')[0]}.{fmt}"
-    draw_dag(data, outfile, fmt,view=False)
-    return {"status": f"DAG drawn and saved in {OUTPUT_FOLDER}"}
-    #except Exception as e:
-    #    return {"error": str(e)}    
+# async def drawdag(config: str = None, CONFIG_FOLDER:str= CONFIG_FOLDER, OUTPUT_FOLDER: str = OUTPUT_FOLDER, outfile:str=None,fmt: str = "png"):
+async def drawdag(config: config,fmt:str="svg"):
+    try:
+        filename = config.filename
+        with open(os.path.join(CONFIG_FOLDER,filename)) as f:
+            data=yaml.load(f, Loader=yaml.FullLoader)
+        # print(data)
+        # print(fmt)
+        if outfile is None:
+            outfile = f"{OUTPUT_FOLDER}/{filename.split('.')[0]}.{fmt}"
+        draw_dag(data, outfile, fmt,view=False)
+        return {"status": f"DAG drawn and saved in {OUTPUT_FOLDER}"}
+    except Exception as e:
+       return {"error": str(e)}    
     
+# create an endpoint to convert a yaml config to svg graph then reactflow json
+@app.post("/yam2svg2json")
+# async def yam2svg2json(config: str = None, CONFIG_FOLDER:str= CONFIG_FOLDER, OUTPUT_FOLDER: str = OUTPUT_FOLDER, outfile:str=None):
+async def yam2svg2json(config: config):
+    try:
+        outfile=None
+        filename = config.filename
+        with open(os.path.join(CONFIG_FOLDER,filename)) as f:
+            data=yaml.load(f, Loader=yaml.FullLoader)
+        if outfile is None:
+            outfile = f"{OUTPUT_FOLDER}/{filename.split('.')[0]}.svg"
+        draw_dag(data, outfile, "svg",view=False)
+        return svg2reactflow(outfile)
+    except Exception as e:
+        return {"error": str(e)}
+
 
 # create a healthcheck endpoint
 @app.get("/healthcheck")
@@ -183,6 +220,7 @@ if __name__ == "__main__":
     print()
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8100,log_config=None)
+    # uvicorn.run(app, host="0.0.0.0", port=8100,log_config=None)
+    uvicorn.run(app, host="0.0.0.0", port=8100)
 
 # uvicorn api:app --host 0.0.0.0 --port 8100 --reload --log-level critical
